@@ -1,3 +1,3 @@
 import './style.css'
-import { InitThreeEngine } from './examples/raycaster'
-new InitThreeEngine()
+import { CannonTest } from './examples/cannon-test'
+new CannonTest()
