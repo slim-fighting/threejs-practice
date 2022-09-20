@@ -1,3 +1,3 @@
 import './style.css'
-import { InitThreeEngine } from './examples/raycaster'
-new InitThreeEngine()
+import { OimoPhysics } from './examples/oimo-physics'
+new OimoPhysics()
