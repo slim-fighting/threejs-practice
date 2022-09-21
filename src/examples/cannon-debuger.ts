@@ -1,13 +1,14 @@
-import { Body, Plane, Vec3, World, Material, Sphere } from "cannon-es";
+import { Body, Plane, Vec3, World, Material, Sphere, ContactMaterial } from "cannon-es";
 // import { Material, Sphere } from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
+import dat from "dat.gui";
 import { AxesHelper, BoxGeometry, Clock, Color, DirectionalLight, GridHelper, HemisphereLight, InstancedMesh, Matrix4, Mesh, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Raycaster, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector2, Vector4, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 
 const width = window.innerWidth;
 const height = window.innerHeight;
-export class CannonTest {
+export class CannonDebuggerTest {
 
     private scene: Scene = new Scene();
     private camera: PerspectiveCamera
@@ -20,17 +21,18 @@ export class CannonTest {
         10
     )
     private world = new World();
-   
+
     constructor() {
         this.camera = new PerspectiveCamera(40, width / height, 1, 1000);
 
         // Setup our world
         this.world.gravity.set(0, -9.82, 0); // m/s²
         // Create a plane
+        const floorMaterial = new Material('floor');
         const floorBody = new Body({
             mass: 0,
             shape: new Plane(),
-            material: new Material('floor')
+            material: floorMaterial
         })
         floorBody.quaternion.setFromAxisAngle(new Vec3(-1, 0, 0), Math.PI * 0.5)
         this.world.addBody(floorBody);
@@ -39,7 +41,7 @@ export class CannonTest {
             new PlaneGeometry(200, 200),
             new MeshStandardMaterial({ color: 0x808080 })
         )
- 
+
         floor.rotateX(-Math.PI / 2);
         floor.receiveShadow = true;
         this.scene.add(floor);
@@ -49,31 +51,69 @@ export class CannonTest {
             new MeshPhongMaterial({ color: new Color().setHex(Math.random() * 0xffffff) })
         )
         this.scene.add(ball)
-
+        const ballMaterial = new Material('ball');
         const ballBody = new Body({
             mass: 5,
             shape: new Sphere(2),
-            material: new Material('ball')
+            material: ballMaterial
         })
-        ballBody.position.set(0, 20, 0);
-       
+        ballBody.position.set(10,20,0)
+
+        const ball2 = new Mesh(
+            new SphereGeometry(2, 32),
+            new MeshPhongMaterial({ color: new Color().setHex(Math.random() * 0xffffff) })
+        )
+        this.scene.add(ball2)
+
+        const ballBody2 = new Body({
+            mass: 5,
+            shape: new Sphere(2),
+            material: ballMaterial
+        })
+        ballBody2.position.set(20,20,0)
+        this.world.addBody(ballBody2);
+
+        // add contactMaterial
+        const defaultContactMaterial = new ContactMaterial(floorMaterial, ballMaterial, {
+            friction: 0.1,
+            restitution: 0.7,
+        })
+        this.world.addContactMaterial(defaultContactMaterial)
         this.world.addBody(ballBody)
 
+        const cannonMeshes: THREE.Mesh[] = []
+        const cannonDebugger = CannonDebugger(this.scene, this.world, {
+            onInit(ballBody, ball) {
+                ball.visible = false
+                cannonMeshes.push(ball)
+            },
+        })
+        //set gui
+        const gui = new dat.GUI()
+        const physicsDebugger = gui.addFolder('physics')
+        const guiObj = {
+            drop() {
+                ballBody.position = new Vec3(0, 20, 0)
+            },
+            CannonDebugger: false,
+        }
+        physicsDebugger.add(guiObj, 'CannonDebugger').name('CannonDebugger ball visible').onChange(v=>{
+            cannonMeshes.forEach(item=>{
+                item.visible = v;
+            })
+        })
+
         const orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
-        const clock = new Clock();
-        let oldElapsedTime = 0;
-        // const cannonDebugger = new CannonDebugger(this.scene, this.world)
+
         const animate = () => {
             orbitControls.update()
-            // cannonDebugger.update()
-            const elapsedTime = clock.getElapsedTime()
-            const deltaTime = elapsedTime - oldElapsedTime
-            oldElapsedTime = elapsedTime
-
-            //sphereBody.applyForce(new Vec3(-5, 0, 0), sphereBody.position)
-            this.world.step(1 / 60, deltaTime, 3)
+            cannonDebugger.update()
+            this.world.fixedStep()
+            ballBody.applyForce(new Vec3(20, 0, 0), new Vec3(0, 0, 0))
+           // ballBody2.applyForce(new Vec3(-10, 0, 0), new Vec3(0, 0, 0))
             floor.position.copy(floorBody.position as any)
             ball.position.copy(ballBody.position as any)
+            ball2.position.copy(ballBody2.position as any)
             this.renderer.render(this.scene, this.camera);
             requestAnimationFrame(animate)
         }
@@ -95,7 +135,7 @@ export class CannonTest {
     }
 
     setCamera() {
-        this.camera.position.set(20, 20, 20);
+        this.camera.position.set(0, 200, 200);
         this.camera.lookAt(0, 0, 0);
     }
 
@@ -137,7 +177,7 @@ export class CannonTest {
     }
 
     enablePhysics() {
- 
+
     }
 
     resizeWindow() {
