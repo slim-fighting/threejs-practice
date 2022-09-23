@@ -1,3 +1,3 @@
 import './style.css'
-import { InitThreeEngine } from './examples/raycaster'
-new InitThreeEngine()
+import { VideoTest } from './examples/video'
+new VideoTest()
