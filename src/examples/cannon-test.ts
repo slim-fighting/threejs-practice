@@ -1,6 +1,4 @@
 import { Body, Plane, Vec3, World, Material, Sphere } from "cannon-es";
-// import { Material, Sphere } from "cannon-es";
-import CannonDebugger from "cannon-es-debugger";
 import { AxesHelper, BoxGeometry, Clock, Color, DirectionalLight, GridHelper, HemisphereLight, InstancedMesh, Matrix4, Mesh, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Raycaster, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector2, Vector4, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 

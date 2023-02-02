@@ -1,5 +1,4 @@
 import { Body, Plane, Vec3, World, Material, Sphere, ContactMaterial } from "cannon-es";
-// import { Material, Sphere } from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
 import dat from "dat.gui";
 import { AxesHelper, BoxGeometry, Clock, Color, DirectionalLight, GridHelper, HemisphereLight, InstancedMesh, Matrix4, Mesh, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Raycaster, Scene, SphereGeometry, SpotLight, SpotLightHelper, Vector2, Vector4, WebGLRenderer } from "three"
@@ -38,7 +37,7 @@ export class CannonDebuggerTest {
         this.world.addBody(floorBody);
 
         const floor = new Mesh(
-            new PlaneGeometry(200, 200),
+            new PlaneGeometry(20, 20),
             new MeshStandardMaterial({ color: 0x808080 })
         )
 
