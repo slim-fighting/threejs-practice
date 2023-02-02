@@ -1,3 +1,3 @@
 import './style.css'
-import { VideoTest } from './examples/video'
-new VideoTest()
+import { RollDice } from './examples/roll-dice'
+new RollDice()
